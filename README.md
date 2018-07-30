@@ -6,10 +6,21 @@
 ### Data:
 - Implicit feedback
 
-### Approach:
 
+### Lenders Clustering
+
+- purpose:
+    - to discover latent features
+    - EDA
+
+- Kmeans
+    - assign points to centroids based on distance
+
+### Recommendation system:
+ 
 - Matrix Factorization:
 
+    - find topic
 
 - Collabrative filtering:  
 consider past users behaviors and recommende based on how other users interact with other items (loans)
