@@ -8,25 +8,19 @@ from nltk.stem.snowball import SnowballStemmer
 from nltk.stem.wordnet import WordNetLemmatizer
 
 import numpy as np
-from bs4 import BeautifulSoup
 import string
 
 
 #Step 1. Load the data
-df = pd.read_csv('description.csv')
-descriptions = df['Description_br_']
+df = pd.read_csv('kiva_ds_csv/lenders.csv')
+descriptions = df['LOAN_BECAUSE']
 
 #Step 2. Vectorize, Stem and Lemmatize words
-
-# vect = CountVectorizer(stop_words='english')
-# model = vect.fit_transform(docs)
 
 snowball = SnowballStemmer('english')
 wordnet = WordNetLemmatizer()
 
 def tokenize(doc):
-    soup = BeautifulSoup(doc,'html.parser')
-    text = soup.get_text()
     translater = str.maketrans('','',string.punctuation)
     a = [wordnet.lemmatize(word) for word in word_tokenize(text.lower().translate(translater))]
     return a
