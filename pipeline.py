@@ -1,3 +1,13 @@
+import pandas as pd
+import numpy as np
+# import matplotlib.pyplot as plt
+# %matplotlib inline
+# plt.style.use('ggplot')
+# import seaborn as sns
+import warnings
+warnings.filterwarnings('ignore')
+from sklearn.preprocessing import StandardScaler
+
 
 def convert_dtype(ls):
     ls = ls.replace({'no': 0, 'yes': 1})
@@ -18,10 +28,6 @@ def convert_to_peroid(ls):
         (ls['LAST_TRANSACTION_DATE'] - today) / -np.timedelta64(1, 'D')).astype(int)
     ls['first_transaction_period'] = (
         (ls['FIRST_TRANSACTION_DATE'] - ls['VINTAGE_DATE']) / np.timedelta64(1, 'D')).astype(int)
-
-    # ~half of the first_deposit_day is missing so we will not use it
-    ls = ls.drop(['LAST_TRANSACTION_DATE', 'LAST_LOGIN_DATE',
-                  'FIRST_TRANSACTION_DATE', 'VINTAGE_DATE', 'FIRST_DEPOSIT_DATE'], axis=1)
     return ls
 
 
@@ -68,7 +74,12 @@ def fill_cont_nans(df, num_cols=['FIRST_LOAN_PURCHASE_WEIGHTED_AVERAGE_TERM',
         df[col].fillna(df[col].mode(), inplace=True)
     return df
 
-def convert_datetime(df, col_list=list(ls.filter(regex=("DATE")).columns)):
+
+def convert_datetime(df, col_list=['VINTAGE_DATE',
+                                   'FIRST_TRANSACTION_DATE',
+                                   'FIRST_DEPOSIT_DATE',
+                                   'LAST_TRANSACTION_DATE',
+                                   'LAST_LOGIN_DATE']):
         for col in col_list:
             df[col] = pd.to_datetime(df[col])
         return df
