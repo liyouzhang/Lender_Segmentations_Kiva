@@ -7,6 +7,7 @@ import plotly
 plotly.tools.set_credentials_file(username='liyouzhang', api_key='gSJMts7w7BogVSyqxiMq')
 import plotly.plotly as py
 import plotly.graph_objs as go
+from mpl_toolkits.mplot3d import Axes3D
 
 
 
@@ -40,9 +41,9 @@ def plot_2D_reduced_X(X_reduced):
 def plotly_3D_reduced_X(X_reduced):
     '''use plotly to visualize the 3D reduced X'''
     trace1 = go.Scatter3d(
-    x=reduced_X_3D[:,0],
-    y=reduced_X_3D[:,1],
-    z=reduced_X_3D[:,2],
+    x=X_reduced[:,0],
+    y=X_reduced[:,1],
+    z=X_reduced[:,2],
     mode='markers',
     marker=dict(
         size=12,
@@ -72,9 +73,9 @@ def kmeans_cluster(X_reduced,cluster_num):
     assigned_cluster = kmeans.transform(X_reduced).argmin(axis=1)
     return y, assigned_cluster
 
-def plot_kmeans(X_reduced,y,xlim_left,xlim_right,ylim_down,ylim_up):
+def plot_2D_kmeans(X_reduced,y,xlim_left,xlim_right,ylim_down,ylim_up):
     '''plot for kmeans results, adjust ax lim to zoom in/out'''
-    fig, ax = plt.subplots(figsize=(6,6))
+    fig, ax = plt.subplots(figsize=(8,6))
     ax.scatter(X_reduced[:,0],X_reduced[:,1],c=y,linewidths=0)
     ax.set_xlim(xlim_left,xlim_right)
     ax.set_ylim(ylim_down,ylim_up)
@@ -82,3 +83,17 @@ def plot_kmeans(X_reduced,y,xlim_left,xlim_right,ylim_down,ylim_up):
     plt.show()
 
 
+def plot_3D_kmeans(X_reduced,y):
+    '''use matplotlib to plot the 3D kmeans cluster results'''
+    fig = plt.figure(figsize=(10,8))
+    ax = fig.add_subplot(111, projection='3d')
+    # for c, m in [('r', 'o'), ('b', '^')]:
+    xs=X_reduced[:,0]
+    ys=X_reduced[:,1]
+    zs=X_reduced[:,2]
+    ax.scatter(xs, ys, zs, c=y, marker='^')
+    ax.set_xlabel('Principal Component One')
+    ax.set_ylabel('Principal Component Two')
+    ax.set_zlabel('Principal Component Three')
+    ax.set_title("Scatterplot in PCA 3-Plane with clustering results")
+    plt.show()
