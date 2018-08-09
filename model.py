@@ -9,7 +9,8 @@ import plotly.plotly as py
 import plotly.graph_objs as go
 from mpl_toolkits.mplot3d import Axes3D
 from collections import Counter
-
+from scipy.cluster.hierarchy import dendrogram, linkage
+from scipy.spatial.distance import pdist, squareform
 
 def PCA_reduce(X,dimensionality):
     '''return reduced n dimensionality matrix and np array of important features'''
@@ -31,7 +32,6 @@ def print_imp_features(df,imp_features):
         feature.append(list(df.columns)[i])
     counter = Counter(feature)    
     print(counter)
-        # print(list(df.columns)[i] + ', count:'+ str(counter[i]))
     return counter
 
 def plot_2D_reduced_X(X_reduced):
@@ -88,7 +88,7 @@ def plot_2D_kmeans(X_reduced,y,xlim_left,xlim_right,ylim_down,ylim_up):
     plt.show()
 
 
-def plot_3D_kmeans(X_reduced,y):
+def plot_3D_kmeans(X_reduced,y,xlim=None,ylim=None,zlim=None):
     '''use matplotlib to plot the 3D kmeans cluster results'''
     fig = plt.figure(figsize=(10,8))
     ax = fig.add_subplot(111, projection='3d')
@@ -101,6 +101,12 @@ def plot_3D_kmeans(X_reduced,y):
     ax.set_ylabel('Principal Component Two')
     ax.set_zlabel('Principal Component Three')
     ax.set_title("Scatterplot in PCA 3-Plane with clustering results")
+    if xlim != None:
+        ax.set_xlim(xlim[0],xlim[1])
+    if ylim != None:
+        ax.set_ylim(ylim[0],ylim[1])
+    if zlim != None:
+        ax.set_zlim(zlim[0],zlim[1])
     plt.show()
 
 def matplotlib_3D_X_reduced(X_reduced):
@@ -116,4 +122,33 @@ def matplotlib_3D_X_reduced(X_reduced):
     ax.set_ylabel('Principal Component Two')
     ax.set_zlabel('Principal Component Three')
     ax.set_title("Scatterplot in PCA 3-Plane with clustering results")
+    plt.show()
+
+def drop_outliers(df,outlier_index_lst=[2987,27627,15038,19433,704]):
+    '''drop the outliers identifed from PCA and Kmeans'''
+    df = df.drop(outlier_index_lst,axis=0)
+    return df
+
+
+def make_dendrogram(X, linkage_method, metric, figsize=(25,15),color_threshold=None):
+    '''
+    This function creates and plots the dendrogram created by hierarchical clustering.
+    
+    INPUTS: Pandas Dataframe, string, string, int
+    
+    OUTPUTS: None
+    '''
+    distxy = squareform(pdist(X, metric=metric))
+    Z = linkage(distxy, linkage_method)
+    plt.figure(figsize=figsize)
+    plt.title('Hierarchical Clustering Dendrogram')
+    plt.xlabel('sample index')
+    plt.ylabel('distance')
+    dendrogram(
+        Z,
+        leaf_rotation=90.,  # rotates the x axis labels
+        leaf_font_size=12.,  # font size for the x axis labels
+#         labels = dataframe.index,
+        color_threshold = color_threshold
+    )
     plt.show()
