@@ -8,7 +8,7 @@ plotly.tools.set_credentials_file(username='liyouzhang', api_key='gSJMts7w7BogVS
 import plotly.plotly as py
 import plotly.graph_objs as go
 from mpl_toolkits.mplot3d import Axes3D
-
+from collections import Counter
 
 
 def PCA_reduce(X,dimensionality):
@@ -25,9 +25,14 @@ def PCA_reduce(X,dimensionality):
     return X_reduced, important_features
 
 def print_imp_features(df,imp_features):
+    '''print important features names and return the counter of the features'''
+    feature = []
     for i in np.array(imp_features).flatten():
-        print(list(df.columns)[i])
-    print ("mode:", stats.mode(np.array(imp_features).flatten()))
+        feature.append(list(df.columns)[i])
+    counter = Counter(feature)    
+    print(counter)
+        # print(list(df.columns)[i] + ', count:'+ str(counter[i]))
+    return counter
 
 def plot_2D_reduced_X(X_reduced):
     '''plot for 2D - PCA'''
@@ -92,6 +97,21 @@ def plot_3D_kmeans(X_reduced,y):
     ys=X_reduced[:,1]
     zs=X_reduced[:,2]
     ax.scatter(xs, ys, zs, c=y, marker='^')
+    ax.set_xlabel('Principal Component One')
+    ax.set_ylabel('Principal Component Two')
+    ax.set_zlabel('Principal Component Three')
+    ax.set_title("Scatterplot in PCA 3-Plane with clustering results")
+    plt.show()
+
+def matplotlib_3D_X_reduced(X_reduced):
+    '''use matplotlib to plot the 3D PCA results'''
+    fig = plt.figure(figsize=(10,8))
+    ax = fig.add_subplot(111, projection='3d')
+    # for c, m in [('r', 'o'), ('b', '^')]:
+    xs=X_reduced[:,0]
+    ys=X_reduced[:,1]
+    zs=X_reduced[:,2]
+    ax.scatter(xs, ys, zs, c='r', marker='^')
     ax.set_xlabel('Principal Component One')
     ax.set_ylabel('Principal Component Two')
     ax.set_zlabel('Principal Component Three')
