@@ -53,7 +53,7 @@ def dummify(df, col_list=['FIRST_TIME_DEPOSITOR_REPORTING_CATEGORY',
 
 def drop_columns(ls, col_list=['FIRST_TIME_DEPOSITOR_REPORTING_CATEGORY', 'FIRST_TRANSACTION_REFERRAL', 'FIRST_BASKET_CATEGORY', 'USER_LOCATION_COUNTRY', 'FIRST_LOAN_REGION', 'USER_LOCATION_STATE', 'USER_LOCATION_CITY',
                                'FIRST_LOAN_COUNTRY', 'LAST_TRANSACTION_DATE', 'LAST_LOGIN_DATE',
-                               'FIRST_TRANSACTION_DATE', 'VINTAGE_DATE', 'FIRST_DEPOSIT_DATE', 'FUND_ACCOUNT_ID', 'LOGIN_ID','VINTAGE_YEAR','VINTAGE_MONTH']):
+                               'FIRST_TRANSACTION_DATE', 'VINTAGE_DATE', 'FIRST_DEPOSIT_DATE', 'FUND_ACCOUNT_ID', 'LOGIN_ID','VINTAGE_YEAR','VINTAGE_MONTH',"ACTIVE_LIFETIME_MONTHS"]):
     ls = ls.drop(col_list, axis=1)
     return ls
 
@@ -81,6 +81,17 @@ def convert_datetime(df, col_list=['VINTAGE_DATE',
         return df
 
 
+def logify(df, col_list=['ACTIVE_LIFETIME_MONTHS']):
+    for col in col_list:
+        df[col+'_log'] = np.log(df[col]+1)
+    return df
+
+def interactify(df, interacter1=['user_rated_driver'], interacter2=['avg_rating_of_driver']):
+    # print(type(df["user_rated_driver"]))
+    for col1, col2 in zip(interacter1, interacter2):
+        df[col1+'_'+col2] = df[col1] * df[col2]
+    return df
+
 def feature_engineer(ls):
     '''return cleaned dataframe and scaled matrix X'''
     ls = convert_dtype(ls)
@@ -89,6 +100,7 @@ def feature_engineer(ls):
     ls = create_donation_tip_col(ls)
     ls = fill_cont_nans(ls)
     ls = dummify(ls)
+    ls = logify(ls)
     ls = drop_columns(ls)
     scaler = StandardScaler()
     scaler.fit(ls.values)
