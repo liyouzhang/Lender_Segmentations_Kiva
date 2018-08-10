@@ -41,9 +41,29 @@ def dummify(df, col_list=['FIRST_TIME_DEPOSITOR_REPORTING_CATEGORY',
     return df
 
 
-def drop_columns(ls, col_list=['FIRST_TIME_DEPOSITOR_REPORTING_CATEGORY', 'FIRST_TRANSACTION_REFERRAL', 'FIRST_BASKET_CATEGORY', 'USER_LOCATION_COUNTRY', 'FIRST_LOAN_REGION', 'USER_LOCATION_STATE', 'USER_LOCATION_CITY',
-                               'FIRST_LOAN_COUNTRY', 'LAST_TRANSACTION_DATE', 'LAST_LOGIN_DATE',
-                               'FIRST_TRANSACTION_DATE', 'VINTAGE_DATE', 'FIRST_DEPOSIT_DATE', 'FUND_ACCOUNT_ID', 'LOGIN_ID','VINTAGE_YEAR','VINTAGE_MONTH',"ACTIVE_LIFETIME_MONTHS"]):
+def drop_columns(ls):
+
+    contain_na_but_important = ['LIFETIME_DEPOSIT_NUM', 
+                                'LIFETIME_ACCOUNT_LOAN_PURCHASE_NUM', 
+                                'LIFETIME_PROXY_LOAN_PURCHASE_NUM',
+                                'LIFETIME_DONATION_NUM', 
+                                'CORE_LOAN_PURCHASE_NUM', 
+                                'CORE_LOAN_PURCHASE_TOTAL', 
+                                'DIRECT_LOAN_PURCHASE_NUM', 
+                                'DIRECT_LOAN_PURCHASE_TOTAL',
+                                'LAST_TRANSACTION_DATE',
+                                'FIRST_TRANSACTION_DATE',
+                                'FIRST_DEPOSIT_DATE']
+    catogories_already_dummified = ['FIRST_TIME_DEPOSITOR_REPORTING_CATEGORY',
+                                    'FIRST_TRANSACTION_REFERRAL', 
+                                    'FIRST_BASKET_CATEGORY', 
+                                    'USER_LOCATION_COUNTRY', 
+                                    'FIRST_LOAN_REGION']
+    no_nan_already_represented = ["VINTAGE_DATE", 'VINTAGE_YEAR', 'VINTAGE_MONTH','LAST_LOGIN_DATE']
+    large_na_not_important = ['USER_LOCATION_STATE', 'USER_LOCATION_CITY',
+                              'FIRST_LOAN_COUNTRY']
+    ids = ['FUND_ACCOUNT_ID', 'LOGIN_ID']
+    col_list = contain_na_but_important+catogories_already_dummified+no_nan_already_represented+large_na_not_important+ids
     ls = ls.drop(col_list, axis=1)
     return ls
 
@@ -59,10 +79,10 @@ def fill_cont_nans(df, num_cols=['FIRST_LOAN_PURCHASE_WEIGHTED_AVERAGE_TERM',
     return df
 
 
-def convert_datetime(df, col_list=['VINTAGE_DATE',
-                                   'FIRST_TRANSACTION_DATE',
-                                   'FIRST_DEPOSIT_DATE',
-                                   'LAST_TRANSACTION_DATE',
+def convert_datetime(df, col_list=[#'VINTAGE_DATE',
+                                   #'FIRST_TRANSACTION_DATE',
+                                   #'FIRST_DEPOSIT_DATE',
+                                   #'LAST_TRANSACTION_DATE',
                                    'LAST_LOGIN_DATE']):
         for col in col_list:
             df[col] = pd.to_datetime(df[col])
@@ -74,11 +94,11 @@ def logify(df, col_list=['ACTIVE_LIFETIME_MONTHS']):
         df[col+'_log'] = np.log(df[col]+1)
     return df
 
-def interactify(df, interacter1=['user_rated_driver'], interacter2=['avg_rating_of_driver']):
-    # print(type(df["user_rated_driver"]))
-    for col1, col2 in zip(interacter1, interacter2):
-        df[col1+'_'+col2] = df[col1] * df[col2]
-    return df
+# def interactify(df, interacter1=['user_rated_driver'], interacter2=['avg_rating_of_driver']):
+#     # print(type(df["user_rated_driver"]))
+#     for col1, col2 in zip(interacter1, interacter2):
+#         df[col1+'_'+col2] = df[col1] * df[col2]
+#     return df
 
 def convert_cat_into_int(df,col_list=['IS_CORPORATE_CAMPAIGN_USER','IS_FREE_TRIAL_USER']):
     for col in col_list:
