@@ -5,3 +5,4 @@ lender_dataset_fromMalissa
 processed_data
 .ipynb_checkpoints
 *unclean*
+*.csv
