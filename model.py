@@ -12,6 +12,11 @@ from collections import Counter
 from scipy.cluster.hierarchy import dendrogram, linkage
 from scipy.spatial.distance import pdist, squareform
 
+from sklearn.cluster import DBSCAN
+from sklearn import metrics
+from sklearn.manifold import locally_linear_embedding
+from time import time
+
 def PCA_reduce(X,dimensionality):
     '''return reduced n dimensionality matrix and np array of important features'''
     important_features = []
@@ -152,3 +157,22 @@ def make_dendrogram(X, linkage_method, metric, figsize=(25,15),color_threshold=N
         color_threshold = color_threshold
     )
     plt.show()
+
+
+def DBSCAN_cluster(X,eps=1,min_samples=10):
+    '''return labels and n_clusters'''
+    db = DBSCAN(eps=eps, min_samples=min_samples).fit(X)
+    core_samples_mask = np.zeros_like(db.labels_, dtype=bool)
+    core_samples_mask[db.core_sample_indices_] = True
+    labels = db.labels_
+    # Number of clusters in labels, ignoring noise if present.
+    n_clusters_ = len(set(labels)) - (1 if -1 in labels else 0)
+
+    return labels,n_clusters_
+
+def lle_dimensionality_reduction(X, n_neighbors, n_dimensionality):
+    time0=time()
+    X_lle,err = locally_linear_embedding(X,n_neighbors,n_dimensionality)
+    time1=time()
+    print(time1-time0)
+    return X_lle,err
