@@ -14,6 +14,10 @@ def convert_to_peroid(ls):
     today = ls['LAST_LOGIN_DATE'].max()  # 2018-5-9
     ls["last_login_today"] = (
         (ls['LAST_LOGIN_DATE'] - today) / -np.timedelta64(1, 'D')).astype(int)
+    ls['last_transaction_today'] = (
+        (ls['LAST_TRANSACTION_DATE'] - today) / -np.timedelta64(1, 'D')).astype(int)
+    ls['first_transaction_period'] = (
+        (ls['FIRST_TRANSACTION_DATE'] - ls['VINTAGE_DATE']) / np.timedelta64(1, 'D')).astype(int)
     return ls
 
 
@@ -31,6 +35,7 @@ def dummify(df, col_list=['FIRST_TIME_DEPOSITOR_REPORTING_CATEGORY',
                           'FIRST_TRANSACTION_REFERRAL',
                           'FIRST_BASKET_CATEGORY',
                           'USER_LOCATION_COUNTRY', 'FIRST_LOAN_REGION']):
+    '''dummify catogorical features'''
     for col in col_list:
         if df[col].isnull().sum() == 0:
             dummies = pd.get_dummies(df[col], prefix=col, drop_first=True)
@@ -42,18 +47,19 @@ def dummify(df, col_list=['FIRST_TIME_DEPOSITOR_REPORTING_CATEGORY',
 
 
 def drop_columns(ls):
-
-    contain_na_but_important = ['LIFETIME_DEPOSIT_NUM',
-                                'LIFETIME_ACCOUNT_LOAN_PURCHASE_NUM',
-                                'LIFETIME_PROXY_LOAN_PURCHASE_NUM',
-                                'LIFETIME_DONATION_NUM',
-                                'CORE_LOAN_PURCHASE_NUM',
-                                'CORE_LOAN_PURCHASE_TOTAL',
-                                'DIRECT_LOAN_PURCHASE_NUM',
-                                'DIRECT_LOAN_PURCHASE_TOTAL',
-                                'LAST_TRANSACTION_DATE',
-                                'FIRST_TRANSACTION_DATE',
-                                'FIRST_DEPOSIT_DATE']
+    '''drop columns that are dummified, represented, ids, and not important'''
+    # contain_na_but_important = ['LIFETIME_DEPOSIT_NUM',
+    #                             'LIFETIME_ACCOUNT_LOAN_PURCHASE_NUM',
+    #                             'LIFETIME_PROXY_LOAN_PURCHASE_NUM',
+    #                             'LIFETIME_DONATION_NUM',
+    #                             'CORE_LOAN_PURCHASE_NUM',
+    #                             'CORE_LOAN_PURCHASE_TOTAL',
+    #                             'DIRECT_LOAN_PURCHASE_NUM',
+    #                             'DIRECT_LOAN_PURCHASE_TOTAL',
+    #                             'LAST_TRANSACTION_DATE',
+    #                             'FIRST_TRANSACTION_DATE',
+    #                             'FIRST_DEPOSIT_DATE',
+    #                             "ACTIVE_LIFETIME_MONTHS"]
     catogories_already_dummified = ['FIRST_TIME_DEPOSITOR_REPORTING_CATEGORY',
                                     'FIRST_TRANSACTION_REFERRAL',
                                     'FIRST_BASKET_CATEGORY',
@@ -64,33 +70,36 @@ def drop_columns(ls):
     large_na_not_important = ['USER_LOCATION_STATE', 'USER_LOCATION_CITY',
                               'FIRST_LOAN_COUNTRY']
     ids = ['FUND_ACCOUNT_ID', 'LOGIN_ID']
-    first_loans_nans = ['FIRST_LOAN_PURCHASE_WEIGHTED_AVERAGE_TERM',
-                        'NUMBER_OF_LOANS_IN_FIRST_LOAN_CHECKOUT',
-                        'NUMBER_OF_FIRST_LOANS_STILL_OUTSTANDING',
-                        'PERCENT_FIRST_LOANS_EXPIRED',
-                        'PERCENT_FIRST_LOANS_DEFAULTED',
-                        'PERCENT_FIRST_LOANS_REPAID'
-                        ]
-    col_list = contain_na_but_important+catogories_already_dummified + no_nan_already_represented+large_na_not_important+ids + first_loans_nans
+    period = ['FIRST_TRANSACTION_DATE','FIRST_DEPOSIT_DATE','LAST_TRANSACTION_DATE']
+    logrified = ['ACTIVE_LIFETIME_MONTHS']
+    # first_loans_nans = ['FIRST_LOAN_PURCHASE_WEIGHTED_AVERAGE_TERM',
+    #                     'NUMBER_OF_LOANS_IN_FIRST_LOAN_CHECKOUT',
+    #                     'NUMBER_OF_FIRST_LOANS_STILL_OUTSTANDING',
+    #                     'PERCENT_FIRST_LOANS_EXPIRED',
+    #                     'PERCENT_FIRST_LOANS_DEFAULTED',
+    #                     'PERCENT_FIRST_LOANS_REPAID'
+    #                     ]
+    col_list = catogories_already_dummified + \
+        no_nan_already_represented+large_na_not_important+ids+period+logrified
     ls = ls.drop(col_list, axis=1)
     return ls
 
 
-def fill_cont_nans(df, num_cols=['FIRST_LOAN_PURCHASE_WEIGHTED_AVERAGE_TERM',
-                                 'NUMBER_OF_LOANS_IN_FIRST_LOAN_CHECKOUT',
-                                 'NUMBER_OF_FIRST_LOANS_STILL_OUTSTANDING',
-                                 'PERCENT_FIRST_LOANS_EXPIRED', 'PERCENT_FIRST_LOANS_DEFAULTED',
-                                 'PERCENT_FIRST_LOANS_REPAID', "LIFETIME_LENDER_WEIGHTED_AVERAGE_LOAN_TERM"],
-                   ):
-    for col in num_cols:
-        df[col].fillna(df[col].median(), inplace=True)
-    return df
+# def fill_cont_nans(df, num_cols=['FIRST_LOAN_PURCHASE_WEIGHTED_AVERAGE_TERM',
+#                                  'NUMBER_OF_LOANS_IN_FIRST_LOAN_CHECKOUT',
+#                                  'NUMBER_OF_FIRST_LOANS_STILL_OUTSTANDING',
+#                                  'PERCENT_FIRST_LOANS_EXPIRED', 'PERCENT_FIRST_LOANS_DEFAULTED',
+#                                  'PERCENT_FIRST_LOANS_REPAID', "LIFETIME_LENDER_WEIGHTED_AVERAGE_LOAN_TERM"],
+#                    ):
+#     for col in num_cols:
+#         df[col].fillna(df[col].median(), inplace=True)
+#     return df
 
 
-def convert_datetime(df, col_list=[  # 'VINTAGE_DATE',
-    #'FIRST_TRANSACTION_DATE',
-    #'FIRST_DEPOSIT_DATE',
-    #'LAST_TRANSACTION_DATE',
+def convert_datetime(df, col_list=['VINTAGE_DATE',
+    'FIRST_TRANSACTION_DATE',
+    'FIRST_DEPOSIT_DATE',
+    'LAST_TRANSACTION_DATE',
         'LAST_LOGIN_DATE']):
         for col in col_list:
             df[col] = pd.to_datetime(df[col])
