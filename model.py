@@ -126,7 +126,7 @@ def matplotlib_3D_X_reduced(X_reduced):
 
 def drop_outliers(df,outlier_index_lst=[2987,27627,15038,19433,704]):
     '''drop the outliers identifed from PCA and Kmeans'''
-    df = df.drop(outlier_index_lst,axis=0)
+    df = df.drop(df.index[outlier_index_lst])
     return df
 
 
