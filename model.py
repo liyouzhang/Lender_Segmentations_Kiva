@@ -81,7 +81,7 @@ def plotly_3D_reduced_X(X_reduced):
 
 def kmeans_cluster(X_reduced,cluster_num):
     '''return y and assigned_cluster for each row'''
-    kmeans = KMeans(init='k-means++', n_clusters=cluster_num, n_init=10,tol=0.01,verbose=0)
+    kmeans = KMeans(init='k-means++', n_clusters=cluster_num, n_init=10,tol=0.0001,verbose=0)
     y = kmeans.fit_predict(X_reduced)
     assigned_cluster = kmeans.transform(X_reduced).argmin(axis=1)
     return y, assigned_cluster
@@ -117,7 +117,7 @@ def plot_3D_kmeans(X_reduced,y,xlim=None,ylim=None,zlim=None):
         ax.set_zlim(zlim[0],zlim[1])
     plt.show()
 
-def matplotlib_3D_X_reduced(X_reduced):
+def matplotlib_3D_X_reduced(X_reduced,label1="First Principle Component",label2="Second Principle Component",label3="Third Principle Component",title="Scatterplot in PCA 3-Plane with clustering results"):
     '''use matplotlib to plot the 3D PCA results'''
     fig = plt.figure(figsize=(10,8))
     ax = fig.add_subplot(111, projection='3d')
@@ -126,16 +126,16 @@ def matplotlib_3D_X_reduced(X_reduced):
     ys=X_reduced[:,1]
     zs=X_reduced[:,2]
     ax.scatter(xs, ys, zs, c='r', marker='^')
-    ax.set_xlabel('Principal Component One')
-    ax.set_ylabel('Principal Component Two')
-    ax.set_zlabel('Principal Component Three')
-    ax.set_title("Scatterplot in PCA 3-Plane with clustering results")
+    ax.set_xlabel(label1)
+    ax.set_ylabel(label2)
+    ax.set_zlabel(label3)
+    ax.set_title(title)
     plt.show()
 
-def drop_outliers(df,outlier_index_lst=[2987,27627,15038,19433,704]):
-    '''drop the outliers identifed from PCA and Kmeans'''
-    df = df.drop(df.index[outlier_index_lst])
-    return df
+# def drop_outliers(df,outlier_index_lst=[2987,27627,15038,19433,704]):
+#     '''drop the outliers identifed from PCA and Kmeans'''
+#     df = df.drop(df.index[outlier_index_lst])
+#     return df
 
 
 def make_dendrogram(X, linkage_method, metric, figsize=(25,15),color_threshold=None):

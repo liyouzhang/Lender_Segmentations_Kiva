@@ -5,29 +5,29 @@ warnings.filterwarnings('ignore')
 from sklearn.preprocessing import StandardScaler
 
 
-def convert_to_peroid(ls):
+def convert_to_peroid(df):
     '''[summary]
     convert datatime stamp to a period until today
     Arguments:
-        ls {[pandas dataframe]} -- [description]
+        df {[pandas dataframe]} -- [description]
     '''
-    today = ls['LAST_LOGIN_DATE'].max()  # 2018-5-9
-    ls["last_login_today_months"] = (
-        (ls['LAST_LOGIN_DATE'] - today) / -np.timedelta64(1, 'M')).astype(int)
+    today = df['LAST_LOGIN_DATE'].max()  # 2018-5-9
+    df["last_login_today_months"] = (
+        (df['LAST_LOGIN_DATE'] - today) / -np.timedelta64(1, 'M')).astype(int)
     no_nan_already_represented = [
         "VINTAGE_DATE", 'VINTAGE_YEAR', 'VINTAGE_MONTH', 'LAST_LOGIN_DATE']
-    ls = ls.drop(no_nan_already_represented, axis=1)
-    return ls
+    df = df.drop(no_nan_already_represented, axis=1)
+    return df
 
 
-def create_donation_tip_col(ls):
+def create_donation_tip_col(df):
     '''Create a new feature on donation rate. replace purchase total 0 to 0.01 to avoid infinite number in division
     '''
-    ls.LIFETIME_ACCOUNT_LOAN_PURCHASE_TOTAL = ls.LIFETIME_ACCOUNT_LOAN_PURCHASE_TOTAL.replace({
+    df.LIFETIME_ACCOUNT_LOAN_PURCHASE_TOTAL = df.LIFETIME_ACCOUNT_LOAN_PURCHASE_TOTAL.replace({
                                                                                               0: 0.01})
-    ls['lifetime_ave_tip_rate'] = (
-        ls.LIFETIME_DONATION_TOTAL/ls.LIFETIME_ACCOUNT_LOAN_PURCHASE_TOTAL)
-    return ls
+    df['lifetime_ave_tip_rate'] = (
+        df.LIFETIME_DONATION_TOTAL/df.LIFETIME_ACCOUNT_LOAN_PURCHASE_TOTAL)
+    return df
 
 
 def dummify(df, col_list=['FIRST_TIME_DEPOSITOR_REPORTING_CATEGORY',
@@ -50,7 +50,7 @@ def dummify(df, col_list=['FIRST_TIME_DEPOSITOR_REPORTING_CATEGORY',
     return df
 
 
-def drop_columns(ls):
+def drop_columns(df):
 
     contain_na_but_important = ['LIFETIME_DEPOSIT_NUM',
                                 'LIFETIME_ACCOUNT_LOAN_PURCHASE_NUM',
@@ -120,9 +120,9 @@ def drop_columns(ls):
                         'PERCENT_FIRST_LOANS_REPAID'
                         ]
     col_list = contain_na_but_important + \
-        large_na_not_important+ids + first_loans_nans + loan_preference
-    ls = ls.drop(col_list, axis=1)
-    return ls
+        large_na_not_important+ids + first_loans_nans #+ loan_preference
+    df = df.drop(col_list, axis=1)
+    return df
 
 
 def fill_cont_nans(df, num_cols=["LIFETIME_LENDER_WEIGHTED_AVERAGE_LOAN_TERM"]):
@@ -131,7 +131,7 @@ def fill_cont_nans(df, num_cols=["LIFETIME_LENDER_WEIGHTED_AVERAGE_LOAN_TERM"]):
     return df
 
 
-def convert_datetime(df, col_list=[  # 'VINTAGE_DATE',
+def convert_datetime(df, col_list=[  
     #'FIRST_TRANSACTION_DATE',
     #'FIRST_DEPOSIT_DATE',
     #'LAST_TRANSACTION_DATE',
@@ -160,17 +160,17 @@ def convert_cat_into_int(df, col_list=['IS_CORPORATE_CAMPAIGN_USER', 'IS_FREE_TR
     return df
 
 
-def feature_engineer(ls):
+def feature_engineer(df):
     '''return cleaned dataframe and scaled matrix X'''
-    ls = drop_columns(ls) #drop the columns we don't use 
-    ls = convert_datetime(ls)
-    ls = convert_to_peroid(ls)
-    ls = create_donation_tip_col(ls)
-    ls = fill_cont_nans(ls)
-    ls = dummify(ls)
-    # ls = logify(ls)
-    ls = convert_cat_into_int(ls)
+    df = drop_columns(df) #drop the columns we don't use 
+    df = convert_datetime(df)
+    df = convert_to_peroid(df)
+    df = create_donation_tip_col(df)
+    df = fill_cont_nans(df)
+    df = dummify(df)
+    # df = logify(df)
+    df = convert_cat_into_int(df)
     scaler = StandardScaler()
-    scaler.fit(ls.values)
-    X = scaler.transform(ls.values)
-    return ls, X
+    scaler.fit(df.values)
+    X = scaler.transform(df.values)
+    return df, X

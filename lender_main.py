@@ -28,8 +28,11 @@ def read_full_data():
     return df
 
 
-def create_outliers_labels(df):
-    '''return df with three outliers labels'''
+def create_lenders_labels(df):
+    '''return df with four lenders labels
+    INPUT - df
+    OUPUT - df
+    '''
     # create dollar amount outliers labels based on 0.9 quantile
     dollar_amount_outliers_list = ['LIFETIME_DONATION_TOTAL',
         'LIFETIME_DEPOSIT_TOTAL', 'LIFETIME_ACCOUNT_LOAN_PURCHASE_TOTAL','FIRST_YEAR_DEPOSIT_TOTAL', 'FIRST_YEAR_LOAN_PURCHASE_TOTAL',
@@ -42,6 +45,9 @@ def create_outliers_labels(df):
 
     # create comments outliers labels based on non_zeros
     df['comments_outliers?'] = np.any(df[['NUM_JOURNAL_COMMENTS','NUM_LOAN_COMMENTS','NUM_STATEMENT_COMMENTS']] != np.zeros((df.shape[0],3)),axis=1)
+    
+    # create user_groups who haven't donated/purchased/deposited any money
+    df['dollar_zeros?'] = np.all(df[dollar_amount_outliers_list].values == np.zeros(df[dollar_amount_outliers_list].shape),axis=1)
     return df
 
 # def create_normal_user(df):
