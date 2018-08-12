@@ -16,6 +16,7 @@ from sklearn.cluster import DBSCAN
 from sklearn import metrics
 from sklearn.manifold import locally_linear_embedding
 from time import time
+from math import pi
 
 def PCA_reduce(X,dimensionality):
     '''return reduced n dimensionality matrix and np array of important features'''
@@ -36,10 +37,19 @@ def PCA_reduce(X,dimensionality):
 def print_imp_features(df,imp_features):
     '''print important features names and return the counter of the features'''
     feature = []
-    for i in np.array(imp_features).flatten():
-        feature.append(list(df.columns)[i])
+    print('1st PC:')
+    for i in np.array(imp_features).flatten()[:5]:
+        feature.append(list(df.columns)[i])        
+        print(list(df.columns)[i])
+    print('2nd PC:')
+    for i in np.array(imp_features).flatten()[5:10]:
+        feature.append(list(df.columns)[i])        
+        print(list(df.columns)[i])
+    print('3rd PC:')
+    for i in np.array(imp_features).flatten()[10:]:
+        feature.append(list(df.columns)[i])        
+        print(list(df.columns)[i])
     counter = Counter(feature)    
-    print(counter)
     return counter
 
 def plot_2D_reduced_X(X_reduced):
@@ -179,3 +189,63 @@ def lle_dimensionality_reduction(X, n_neighbors, n_dimensionality):
     time1=time()
     print(time1-time0)
     return X_lle,err
+
+def plot_radar(df, dpi = 64, category=False,num_of_cat=False):
+    '''plot spider graph to interpret clustering results
+    INPUT - df: cluster number as index'''
+    # initialize the figure
+    my_dpi=dpi
+    plt.figure(figsize=(800/my_dpi, 1133/my_dpi), dpi=my_dpi)
+    plt.tight_layout()
+    
+    # Create a color palette:
+    my_palette = plt.cm.get_cmap("Set2", len(df.index))
+
+    for row in range(0, len(df.index)):
+        make_spider(df=df, row=row, title='group{}'.format(row), color=my_palette(row),category=category,num_of_cat=num_of_cat)
+
+def make_spider(df, row, title, color,category,num_of_cat):
+    '''plot spider graph to interpret clustering results. called in plot_radar function'''
+    # number of variable
+    categories=list(df)
+    if category == True:
+        cat =[]
+        for c in categories:
+            cat.append(c.split("_")[-1])
+        categories = cat
+    elif num_of_cat == True:
+        cat =[]
+        for c in categories:
+            cat.append(" ".join(c.split("_")[2:-1]))
+        categories = cat
+    
+    N = len(categories)
+
+    # What will be the angle of each axis in the plot? (we divide the plot / number of variable)
+    angles = [n / float(N) * 2 * pi for n in range(N)]
+    angles += angles[:1]
+
+    # Initialise the spider plot
+    ax = plt.subplot(3,2,row+1, polar=True)
+
+    # If you want the first axis to be on top:
+    ax.set_theta_offset(pi / 2)
+    ax.set_theta_direction(-1)
+    
+    
+    # Draw one axe per variable + add labels labels yet
+    plt.xticks(angles[:-1], categories, color='grey', size=8)
+
+    # Draw ylabels
+    ax.set_rlabel_position(0)
+    #plt.yticks([10,20,30], ["10","20","30"], color="grey", size=7)
+    #plt.ylim(0,40)
+
+    # Ind1
+    values=df.loc[row].values.flatten().tolist()
+    values += values[:1]
+    ax.plot(angles, values, color=color, linewidth=2, linestyle='solid')
+    ax.fill(angles, values, color=color, alpha=0.4)
+
+    # Add a title
+    plt.title(title, size=11, color=color, y=1.1)
