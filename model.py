@@ -80,11 +80,11 @@ def plotly_3D_reduced_X(X_reduced):
     py.iplot(fig, filename='simple-3d-scatter')
 
 def kmeans_cluster(X_reduced,cluster_num):
-    '''return y and assigned_cluster for each row'''
+    '''return y (assigned_cluster) for each row'''
     kmeans = KMeans(init='k-means++', n_clusters=cluster_num, n_init=10,tol=0.0001,verbose=0)
     y = kmeans.fit_predict(X_reduced)
-    assigned_cluster = kmeans.transform(X_reduced).argmin(axis=1)
-    return y, assigned_cluster
+    # assigned_cluster = kmeans.transform(X_reduced).argmin(axis=1)
+    return y
 
 def plot_2D_kmeans(X_reduced,y,xlim_left,xlim_right,ylim_down,ylim_up):
     '''plot for kmeans results, adjust ax lim to zoom in/out'''
