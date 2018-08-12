@@ -28,6 +28,9 @@ def PCA_reduce(X,dimensionality):
     X_reduced = np.dot(X,pcd.components_.T)
     print('Reduced X shape:', X_reduced.shape)
     important_features = np.array(important_features)
+    print('Explained variance:', pcd.explained_variance_)
+    print('Explained variance ratio:', pcd.explained_variance_ratio_)
+    print('Explained variance ratio accumulated:', pcd.explained_variance_ratio_.cumsum())
     return X_reduced, important_features
 
 def print_imp_features(df,imp_features):

@@ -86,8 +86,7 @@ def logify(df, col_list=['ACTIVE_LIFETIME_MONTHS']):
         df[col+'_log'] = np.log(df[col]+1)
     return df
 
-def interactify(df, interacter1=['user_rated_driver'], interacter2=['avg_rating_of_driver']):
-    # print(type(df["user_rated_driver"]))
+def interactify(df, interacter1=[''], interacter2=['']):
     for col1, col2 in zip(interacter1, interacter2):
         df[col1+'_'+col2] = df[col1] * df[col2]
     return df

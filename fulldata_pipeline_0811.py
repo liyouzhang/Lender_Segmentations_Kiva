@@ -14,6 +14,9 @@ def convert_to_peroid(ls):
     today = ls['LAST_LOGIN_DATE'].max()  # 2018-5-9
     ls["last_login_today"] = (
         (ls['LAST_LOGIN_DATE'] - today) / -np.timedelta64(1, 'D')).astype(int)
+    no_nan_already_represented = [
+        "VINTAGE_DATE", 'VINTAGE_YEAR', 'VINTAGE_MONTH', 'LAST_LOGIN_DATE']
+    ls = ls.drop(no_nan_already_represented, axis=1)
     return ls
 
 
@@ -38,6 +41,12 @@ def dummify(df, col_list=['FIRST_TIME_DEPOSITOR_REPORTING_CATEGORY',
             dummies = pd.get_dummies(
                 df[col], prefix=col, dummy_na=True, drop_first=True)
         df[dummies.columns] = dummies
+    catogories_already_dummified = ['FIRST_TIME_DEPOSITOR_REPORTING_CATEGORY',
+                                    'FIRST_TRANSACTION_REFERRAL',
+                                    'FIRST_BASKET_CATEGORY',
+                                    'USER_LOCATION_COUNTRY',
+                                    'FIRST_LOAN_REGION']
+    df = df.drop(catogories_already_dummified, axis=1)
     return df
 
 
@@ -53,14 +62,53 @@ def drop_columns(ls):
                                 'DIRECT_LOAN_PURCHASE_TOTAL',
                                 'LAST_TRANSACTION_DATE',
                                 'FIRST_TRANSACTION_DATE',
-                                'FIRST_DEPOSIT_DATE']
-    catogories_already_dummified = ['FIRST_TIME_DEPOSITOR_REPORTING_CATEGORY',
-                                    'FIRST_TRANSACTION_REFERRAL',
-                                    'FIRST_BASKET_CATEGORY',
-                                    'USER_LOCATION_COUNTRY',
-                                    'FIRST_LOAN_REGION']
-    no_nan_already_represented = [
-        "VINTAGE_DATE", 'VINTAGE_YEAR', 'VINTAGE_MONTH', 'LAST_LOGIN_DATE']
+                                'FIRST_DEPOSIT_DATE',
+                                "ACTIVE_LIFETIME_MONTHS"]
+    loan_preference = ['NUM_DISTINCT_COUNTRIES_LENT_TO',
+                       'NUM_AFRICA_LOANS',
+                       'NUM_ASIA_LOANS',
+                       'NUM_CENTRAL_AMERICA_LOANS',
+                       'NUM_EASTERN_EUROPE_LOANS',
+                       'NUM_NORTH_AMERICA_LOANS',
+                       'NUM_OCEANIA_LOANS',
+                       'NUM_SOUTH_AMERICA_LOANS',
+                       'NUM_EXPIRING_SOON_LOANS',
+                       'NUM_SECTOR_AGRICULTURE_LOANS',
+                       'NUM_SECTOR_TRANSPORTATION_LOANS',
+                       'NUM_SECTOR_SERVICE_LOANS',
+                       'NUM_SECTOR_CLOTHING_LOANS',
+                       'NUM_SECTOR_HEALTH_LOANS',
+                       'NUM_SECTOR_RETAIL_LOANS',
+                       'NUM_SECTOR_MANUFACTURING_LOANS',
+                       'NUM_SECTOR_ARTS_LOANS',
+                       'NUM_SECTOR_HOUSING_LOANS',
+                       'NUM_SECTOR_FOOD_LOANS',
+                       'NUM_SECTOR_WHOLESALE_LOANS',
+                       'NUM_SECTOR_CONSTRUCTION_LOANS',
+                       'NUM_SECTOR_EDUCATION_LOANS',
+                       'NUM_SECTOR_PERSONAL_USE_LOANS',
+                       'NUM_SECTOR_ENTERTAINMENT_LOANS',
+                       'NUM_BUNDLE_GREEN_LOANS',
+                       'NUM_BUNDLE_HIGHER_ED_LOANS',
+                       'NUM_BUNDLE_ISLAMIC_FINANCE_LOANS',
+                       'NUM_BUNDLE_YOUTH_LOANS',
+                       'NUM_BUNDLE_STARTUP_LOANS',
+                       'NUM_BUNDLE_WATER_LOANS',
+                       'NUM_BUNDLE_VULNERABLE_LOANS',
+                       'NUM_BUNDLE_FAIR_TRADE_LOANS',
+                       'NUM_BUNDLE_MOBILE_TECH_LOANS',
+                       'NUM_BUNDLE_RURAL_LOANS',
+                       'NUM_BUNDLE_UNDERFUNDED_LOANS',
+                       'NUM_BUNDLE_CONFLICT_ZONE_LOANS',
+                       'NUM_BUNDLE_JOB_CREATION_SME_LOANS',
+                       'NUM_BUNDLE_GROWING_BUSINESSES_LOANS',
+                       'NUM_BUNDLE_HEALTH_LOANS',
+                       'NUM_BUNDLE_DISASTER_RECOVERY_LOANS',
+                       'NUM_BUNDLE_INNOVATIVE_LOANS',
+                       'NUM_BUNDLE_REFUGEE_LOANS',
+                       'NUM_BUNDLE_SOCIAL_ENTERPRISE_LOANS',
+                       'NUM_BUNDLE_CLEAN_ENERGY_LOANS',
+                       'NUM_BUNDLE_SOLAR_LOANS']
     large_na_not_important = ['USER_LOCATION_STATE', 'USER_LOCATION_CITY',
                               'FIRST_LOAN_COUNTRY']
     ids = ['FUND_ACCOUNT_ID', 'LOGIN_ID']
@@ -71,17 +119,13 @@ def drop_columns(ls):
                         'PERCENT_FIRST_LOANS_DEFAULTED',
                         'PERCENT_FIRST_LOANS_REPAID'
                         ]
-    col_list = contain_na_but_important+catogories_already_dummified + no_nan_already_represented+large_na_not_important+ids + first_loans_nans
+    col_list = contain_na_but_important + \
+        large_na_not_important+ids + first_loans_nans + loan_preference
     ls = ls.drop(col_list, axis=1)
     return ls
 
 
-def fill_cont_nans(df, num_cols=['FIRST_LOAN_PURCHASE_WEIGHTED_AVERAGE_TERM',
-                                 'NUMBER_OF_LOANS_IN_FIRST_LOAN_CHECKOUT',
-                                 'NUMBER_OF_FIRST_LOANS_STILL_OUTSTANDING',
-                                 'PERCENT_FIRST_LOANS_EXPIRED', 'PERCENT_FIRST_LOANS_DEFAULTED',
-                                 'PERCENT_FIRST_LOANS_REPAID', "LIFETIME_LENDER_WEIGHTED_AVERAGE_LOAN_TERM"],
-                   ):
+def fill_cont_nans(df, num_cols=["LIFETIME_LENDER_WEIGHTED_AVERAGE_LOAN_TERM"]):
     for col in num_cols:
         df[col].fillna(df[col].median(), inplace=True)
     return df
@@ -97,10 +141,10 @@ def convert_datetime(df, col_list=[  # 'VINTAGE_DATE',
         return df
 
 
-def logify(df, col_list=['ACTIVE_LIFETIME_MONTHS']):
-    for col in col_list:
-        df[col+'_log'] = np.log(df[col]+1)
-    return df
+# def logify(df, col_list=['ACTIVE_LIFETIME_MONTHS']):
+#     for col in col_list:
+#         df[col+'_log'] = np.log(df[col]+1)
+#     return df
 
 # def interactify(df, interacter1=['user_rated_driver'], interacter2=['avg_rating_of_driver']):
 #     # print(type(df["user_rated_driver"]))
@@ -110,6 +154,7 @@ def logify(df, col_list=['ACTIVE_LIFETIME_MONTHS']):
 
 
 def convert_cat_into_int(df, col_list=['IS_CORPORATE_CAMPAIGN_USER', 'IS_FREE_TRIAL_USER']):
+    '''convert categorical data into its integers (0 or 1)'''
     for col in col_list:
         df[col] = df[col].cat.codes
     return df
@@ -117,13 +162,13 @@ def convert_cat_into_int(df, col_list=['IS_CORPORATE_CAMPAIGN_USER', 'IS_FREE_TR
 
 def feature_engineer(ls):
     '''return cleaned dataframe and scaled matrix X'''
+    ls = drop_columns(ls) #drop the columns we don't use 
     ls = convert_datetime(ls)
     ls = convert_to_peroid(ls)
     ls = create_donation_tip_col(ls)
     ls = fill_cont_nans(ls)
     ls = dummify(ls)
-    ls = logify(ls)
-    ls = drop_columns(ls)
+    # ls = logify(ls)
     ls = convert_cat_into_int(ls)
     scaler = StandardScaler()
     scaler.fit(ls.values)
