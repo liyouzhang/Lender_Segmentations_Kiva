@@ -12,8 +12,8 @@ def convert_to_peroid(ls):
         ls {[pandas dataframe]} -- [description]
     '''
     today = ls['LAST_LOGIN_DATE'].max()  # 2018-5-9
-    ls["last_login_today"] = (
-        (ls['LAST_LOGIN_DATE'] - today) / -np.timedelta64(1, 'D')).astype(int)
+    ls["last_login_today_months"] = (
+        (ls['LAST_LOGIN_DATE'] - today) / -np.timedelta64(1, 'M')).astype(int)
     no_nan_already_represented = [
         "VINTAGE_DATE", 'VINTAGE_YEAR', 'VINTAGE_MONTH', 'LAST_LOGIN_DATE']
     ls = ls.drop(no_nan_already_represented, axis=1)
