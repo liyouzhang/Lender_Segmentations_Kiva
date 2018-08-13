@@ -33,10 +33,25 @@ def create_features(df):
     # df['ave_deposit_per_month'] = df.LIFETIME_DEPOSIT_TOTAL/(df.ACCOUNT_AGE_MONTHS +1)
     return df
 
-def dummify(df, col_list=['FIRST_TIME_DEPOSITOR_REPORTING_CATEGORY',
+def dummify(df, drop_first_loan_region=False):
+    #'USER_LOCATION_COUNTRY' - dropped it
+    if drop_first_loan_region == False:
+        col_list=['FIRST_TIME_DEPOSITOR_REPORTING_CATEGORY',
                           'FIRST_TRANSACTION_REFERRAL',
                           'FIRST_BASKET_CATEGORY',
-                          'USER_LOCATION_COUNTRY', 'FIRST_LOAN_REGION']):
+                          'FIRST_LOAN_REGION']
+        catogories_already_dummified = ['FIRST_TIME_DEPOSITOR_REPORTING_CATEGORY',
+                                    'FIRST_TRANSACTION_REFERRAL',
+                                    'FIRST_BASKET_CATEGORY','FIRST_LOAN_REGION']
+    else:
+        col_list=['FIRST_TIME_DEPOSITOR_REPORTING_CATEGORY',
+                          'FIRST_TRANSACTION_REFERRAL',
+                          'FIRST_BASKET_CATEGORY']
+        catogories_already_dummified = ['FIRST_TIME_DEPOSITOR_REPORTING_CATEGORY',
+                                    'FIRST_TRANSACTION_REFERRAL',
+                                    'FIRST_BASKET_CATEGORY']
+        df = df.drop('FIRST_LOAN_REGION',axis=1)
+        
     for col in col_list:
         if df[col].isnull().sum() == 0:
             dummies = pd.get_dummies(df[col], prefix=col, drop_first=True)
@@ -44,17 +59,12 @@ def dummify(df, col_list=['FIRST_TIME_DEPOSITOR_REPORTING_CATEGORY',
             dummies = pd.get_dummies(
                 df[col], prefix=col, dummy_na=True, drop_first=True)
         df[dummies.columns] = dummies
-    catogories_already_dummified = ['FIRST_TIME_DEPOSITOR_REPORTING_CATEGORY',
-                                    'FIRST_TRANSACTION_REFERRAL',
-                                    'FIRST_BASKET_CATEGORY',
-                                    'USER_LOCATION_COUNTRY',
-                                    'FIRST_LOAN_REGION']
+
     df = df.drop(catogories_already_dummified, axis=1)
     return df
 
 
-def drop_columns(df):
-
+def drop_columns(df, drop_loan_preference=False,drop_loan_regions=False):
     contain_na_but_important = ['LIFETIME_DEPOSIT_NUM',
                                 'LIFETIME_ACCOUNT_LOAN_PURCHASE_NUM',
                                 'LIFETIME_PROXY_LOAN_PURCHASE_NUM',
@@ -67,15 +77,16 @@ def drop_columns(df):
                                 'FIRST_TRANSACTION_DATE',
                                 'FIRST_DEPOSIT_DATE',
                                 "ACTIVE_LIFETIME_MONTHS"]
-    loan_preference = ['NUM_DISTINCT_COUNTRIES_LENT_TO',
+    loan_regions = ['NUM_DISTINCT_COUNTRIES_LENT_TO',
                        'NUM_AFRICA_LOANS',
                        'NUM_ASIA_LOANS',
                        'NUM_CENTRAL_AMERICA_LOANS',
                        'NUM_EASTERN_EUROPE_LOANS',
                        'NUM_NORTH_AMERICA_LOANS',
                        'NUM_OCEANIA_LOANS',
-                       'NUM_SOUTH_AMERICA_LOANS',
-                       'NUM_EXPIRING_SOON_LOANS',
+                       'NUM_SOUTH_AMERICA_LOANS']
+    loan_preference = [
+                       #'NUM_EXPIRING_SOON_LOANS'
                        'NUM_SECTOR_AGRICULTURE_LOANS',
                        'NUM_SECTOR_TRANSPORTATION_LOANS',
                        'NUM_SECTOR_SERVICE_LOANS',
@@ -113,7 +124,7 @@ def drop_columns(df):
                        'NUM_BUNDLE_CLEAN_ENERGY_LOANS',
                        'NUM_BUNDLE_SOLAR_LOANS']
     large_na_not_important = ['USER_LOCATION_STATE', 'USER_LOCATION_CITY',
-                              'FIRST_LOAN_COUNTRY']
+                              'FIRST_LOAN_COUNTRY','USER_LOCATION_COUNTRY']
     ids = ['FUND_ACCOUNT_ID', 'LOGIN_ID']
     first_loans_nans = ['FIRST_LOAN_PURCHASE_WEIGHTED_AVERAGE_TERM',
                         'NUMBER_OF_LOANS_IN_FIRST_LOAN_CHECKOUT',
@@ -122,8 +133,13 @@ def drop_columns(df):
                         'PERCENT_FIRST_LOANS_DEFAULTED',
                         'PERCENT_FIRST_LOANS_REPAID'
                         ]
-    col_list = contain_na_but_important + \
-        large_na_not_important+ids + first_loans_nans #+ loan_preference
+    col_list = contain_na_but_important + large_na_not_important+ids + first_loans_nans
+    
+    if drop_loan_preference == True:
+        col_list = col_list + loan_preference
+    if drop_loan_regions == True:
+        col_list = col_list + loan_regions
+        
     df = df.drop(col_list, axis=1)
     return df
 
@@ -163,17 +179,21 @@ def convert_cat_into_int(df, col_list=['IS_CORPORATE_CAMPAIGN_USER', 'IS_FREE_TR
     return df
 
 
-def feature_engineer(df):
-    '''return cleaned dataframe and scaled matrix X'''
-    df = drop_columns(df) #drop the columns we don't use 
+def feature_engineer(df, drop_loan_preference=False,drop_loan_regions=False,drop_first_loan_region=False):
+    '''
+    INPUT - dataframe, drop_loan_preference True/False
+    OUTPUT - cleaned dataframe and scaled matrix X
+    '''
+    df = drop_columns(df,drop_loan_preference=drop_loan_preference,drop_loan_regions=drop_loan_regions) #drop the columns we don't use 
     df = convert_datetime(df)
     df = convert_to_peroid(df)
     df = create_features(df)
     df = fill_cont_nans(df)
-    df = dummify(df)
+    df = dummify(df,drop_first_loan_region=drop_first_loan_region)
     # df = logify(df)
     df = convert_cat_into_int(df)
     scaler = StandardScaler()
     scaler.fit(df.values)
     X = scaler.transform(df.values)
     return df, X
+

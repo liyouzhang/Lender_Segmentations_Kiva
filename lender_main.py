@@ -13,8 +13,6 @@ import json
 # %autoreload 2
 # pd.options.display.max_rows = 999
 
-from fulldata_pipeline_0811 import *
-
 def read_full_data():
     '''read dataframe with column_types to reduce RAM use
     INPUT - None
