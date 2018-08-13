@@ -20,15 +20,18 @@ def convert_to_peroid(df):
     return df
 
 
-def create_donation_tip_col(df):
-    '''Create a new feature on donation rate. replace purchase total 0 to 0.01 to avoid infinite number in division
+def create_features(df):
+    '''Create new features including donation rate, ave_loan_purchase_per_month
     '''
-    df.LIFETIME_ACCOUNT_LOAN_PURCHASE_TOTAL = df.LIFETIME_ACCOUNT_LOAN_PURCHASE_TOTAL.replace({
-                                                                                              0: 0.01})
-    df['lifetime_ave_tip_rate'] = (
-        df.LIFETIME_DONATION_TOTAL/df.LIFETIME_ACCOUNT_LOAN_PURCHASE_TOTAL)
-    return df
+    #Add 1 to avoid infinite number in division
+    df['lifetime_ave_donation_rate'] = df.LIFETIME_DONATION_TOTAL/(df.LIFETIME_ACCOUNT_LOAN_PURCHASE_TOTAL+1)
 
+    #add 1 to avoid infinite number in division
+    df['ave_loan_purchase_per_month'] = df.LIFETIME_ACCOUNT_LOAN_PURCHASE_TOTAL/(df.ACCOUNT_AGE_MONTHS +1)
+
+    # #add 1 to avoid infinite number in division
+    # df['ave_deposit_per_month'] = df.LIFETIME_DEPOSIT_TOTAL/(df.ACCOUNT_AGE_MONTHS +1)
+    return df
 
 def dummify(df, col_list=['FIRST_TIME_DEPOSITOR_REPORTING_CATEGORY',
                           'FIRST_TRANSACTION_REFERRAL',
@@ -165,7 +168,7 @@ def feature_engineer(df):
     df = drop_columns(df) #drop the columns we don't use 
     df = convert_datetime(df)
     df = convert_to_peroid(df)
-    df = create_donation_tip_col(df)
+    df = create_features(df)
     df = fill_cont_nans(df)
     df = dummify(df)
     # df = logify(df)
