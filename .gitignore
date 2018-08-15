@@ -6,3 +6,8 @@ processed_data
 .ipynb_checkpoints
 *unclean*
 *.csv
+one_pager*
+*.ppt
+*.pptx
+*.pyc
+201808_Liyou_Zhang_updated_A4.pdf
