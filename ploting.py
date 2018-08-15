@@ -76,7 +76,7 @@ def plot_3D_kmeans(X_reduced,y,xlabel,ylabel,zlabel,title,xlim=None,ylim=None,zl
         ax.set_zlim(zlim[0],zlim[1])
     plt.show()
 
-def matplotlib_3D_X_reduced(X_reduced,label1="First Principle Component",label2="Second Principle Component",label3="Third Principle Component",title="Scatterplot in PCA 3-Plane with clustering results"):
+def matplotlib_3D_X_reduced(X_reduced,label1="First Principle Component",label2="Second Principle Component",label3="Third Principle Component",title="Scatterplot in PCA 3D-Plane"):
     '''use matplotlib to plot the 3D PCA results'''
     fig = plt.figure(figsize=(10,8))
     ax = fig.add_subplot(111, projection='3d')
@@ -84,7 +84,7 @@ def matplotlib_3D_X_reduced(X_reduced,label1="First Principle Component",label2=
     xs=X_reduced[:,0]
     ys=X_reduced[:,1]
     zs=X_reduced[:,2]
-    ax.scatter(xs, ys, zs, c='r', marker='^')
+    ax.scatter(xs, ys, zs, c='green', marker='^')
     ax.set_xlabel(label1)
     ax.set_ylabel(label2)
     ax.set_zlabel(label3)
@@ -169,11 +169,11 @@ def plot_venn_3(a, b, c, a_and_b, a_and_c, b_and_c, a_and_b_and_c, a_label="Grou
     position5 = b_and_c-a_and_b_and_c
     position6 = a_and_b_and_c
 
-    # Custom text labels: change the label of group A
-    v = venn3(subsets=(position0, position1, position2, position3, position4,
-                       position5, position6), set_labels=(a_label, b_label, c_label))
-    #v.get_label_by_id('A').set_text('The biggest outliers!')
-    plt.show()
+    # # Custom text labels: change the label of group A
+    # v = venn3(subsets=(position0, position1, position2, position3, position4,
+    #                    position5, position6), set_labels=(a_label, b_label, c_label))
+    # #v.get_label_by_id('A').set_text('The biggest outliers!')
+    # plt.show()
 
     # Line style: can be 'dashed' or 'dotted' for example
     v = venn3(subsets=(position0, position1, position2, position3, position4,
@@ -182,14 +182,14 @@ def plot_venn_3(a, b, c, a_and_b, a_and_c, b_and_c, a_and_b_and_c, a_label="Grou
                                position5, position6), linestyle='dashed', linewidth=1, color="grey")
     plt.show()
 
-    # Change one group only
-    v = venn3(subsets=(position0, position1, position2, position3, position4,
-                       position5, position6), set_labels=(a_label, b_label, c_label))
-    c = venn3_circles(subsets=(position0, position1, position2, position3, position4,
-                               position5, position6), linestyle='dashed', linewidth=1, color="grey")
-    c[0].set_lw(8.0)
-    c[0].set_ls('dotted')
-    c[0].set_color('skyblue')
+    # # Change one group only
+    # v = venn3(subsets=(position0, position1, position2, position3, position4,
+    #                    position5, position6), set_labels=(a_label, b_label, c_label))
+    # c = venn3_circles(subsets=(position0, position1, position2, position3, position4,
+    #                            position5, position6), linestyle='dashed', linewidth=1, color="grey")
+    # c[0].set_lw(8.0)
+    # c[0].set_ls('dotted')
+    # c[0].set_color('skyblue')
     plt.show()
 
     # Color
