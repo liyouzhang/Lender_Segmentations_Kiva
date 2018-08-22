@@ -5,18 +5,13 @@ import warnings
 warnings.filterwarnings('ignore')
 import json
 
-# FOR JUPYTER NOTEBOOK
-# import matplotlib.pyplot as plt
-# %matplotlib inline
-# plt.style.use('ggplot')
-# %load_ext autoreload
-# %autoreload 2
-# pd.options.display.max_rows = 999
 
 def read_full_data():
-    '''read dataframe with column_types to reduce RAM use
-    INPUT - None
-    OUPTUT - df
+    '''[summary]
+    read dataframe with column_types to reduce RAM use
+
+    Returns:
+        df[pandas dataframe]
     '''
     json1_file = open('column_types.json')
     json1_str = json1_file.read()
@@ -27,10 +22,16 @@ def read_full_data():
 
 
 def create_lenders_labels(df):
-    '''return df with four lenders labels
-    INPUT - df
-    OUPUT - df
+    '''[summary]
+    create outliers labels based on different criteria
+
+    Arguments:
+        df {[pandas dataframe]} -- input data
+
+    Returns:
+        df[type] -- df with four lenders labels
     '''
+
     # create dollar amount outliers labels based on 0.9 quantile
     dollar_amount_outliers_list = ['LIFETIME_DONATION_TOTAL',
         'LIFETIME_DEPOSIT_TOTAL', 'LIFETIME_ACCOUNT_LOAN_PURCHASE_TOTAL','FIRST_YEAR_DEPOSIT_TOTAL', 'FIRST_YEAR_LOAN_PURCHASE_TOTAL',
@@ -43,12 +44,8 @@ def create_lenders_labels(df):
 
     # create comments outliers labels based on non_zeros
     df['comments_outliers?'] = np.any(df[['NUM_JOURNAL_COMMENTS','NUM_LOAN_COMMENTS','NUM_STATEMENT_COMMENTS']] != np.zeros((df.shape[0],3)),axis=1)
-    
+
     # create user_groups who haven't donated/purchased/deposited any money
     df['dollar_zeros?'] = np.all(df[dollar_amount_outliers_list].values == np.zeros(df[dollar_amount_outliers_list].shape),axis=1)
     return df
 
-# def create_normal_user(df):
-#     # normal user group 
-#     normal = df[~df['dollar_outliers?']][~df['team_outliers?']][~df['comments_outliers?']][~df['dollar_zeros?']]
-#     ndf, X = feature_engineer(normal)
