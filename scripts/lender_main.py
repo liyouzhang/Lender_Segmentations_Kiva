@@ -18,7 +18,7 @@ def read_full_data():
     INPUT - None
     OUPTUT - df
     '''
-    json1_file = open('column_types.json')
+    json1_file = open('scripts/column_types.json')
     json1_str = json1_file.read()
     column_types = json.loads(json1_str)
     # read data
