@@ -5,7 +5,7 @@ import plotly.plotly as py
 import plotly.graph_objs as go
 from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt
-
+import numpy as np
 
 def plot_2D_reduced_X(X_reduced):
     '''plot for 2D - PCA'''
@@ -92,13 +92,13 @@ def matplotlib_3D_X_reduced(X_reduced,label1="First Principle Component",label2=
     plt.show()
 
 
-def plot_radar(df, dpi=64, category=False, num_of_cat=False,ylim=(0,1)):
+def plot_radar(df, figname=None, dpi=64, category=False, num_of_cat=False,ylim=(0,1)):
     '''plot spider graph to interpret clustering results
     INPUT - df: cluster number as index'''
     # initialize the figure
     my_dpi = dpi
-    plt.figure(figsize=(1133/my_dpi,800/my_dpi), dpi=my_dpi)
-    plt.tight_layout()
+    plt.figure(figsize=(1333/my_dpi,900/my_dpi), dpi=my_dpi)
+    # plt.tight_layout()
 
     # Create a color palette:
     my_palette = plt.cm.get_cmap("Set1", len(df.index))
@@ -106,6 +106,8 @@ def plot_radar(df, dpi=64, category=False, num_of_cat=False,ylim=(0,1)):
     for row in range(0, len(df.index)):
         make_spider(df=df, row=row, title='group{}'.format(
             row), color=my_palette(row), category=category, num_of_cat=num_of_cat,ylim=ylim)
+    if figname != None:
+        plt.savefig('{}.png'.format(figname))
 
 
 def make_spider(df, row, title, color, category, num_of_cat,ylim):
@@ -152,7 +154,7 @@ def make_spider(df, row, title, color, category, num_of_cat,ylim):
 
     # Add a title
     plt.title(title, size=20, color=color, y=1.1)
-
+    plt.savefig('group{}'.format(row))
 
 # Import the library
 import matplotlib.pyplot as plt
@@ -161,25 +163,24 @@ from matplotlib_venn import venn3, venn3_circles
 
 def plot_venn_3(a, b, c, a_and_b, a_and_c, b_and_c, a_and_b_and_c, a_label="Group A", b_label="Group B", c_label="Group C"):
     '''use matplotlib venn library to plot three groups interactions'''
-    position0 = a-a_and_b-a_and_c+a_and_b_and_c
-    position1 = b-b_and_c-a_and_b+a_and_b_and_c
-    position2 = a_and_b-a_and_b_and_c
-    position3 = c-a_and_c-b_and_c+a_and_b_and_c
-    position4 = a_and_b-a_and_b_and_c
-    position5 = b_and_c-a_and_b_and_c
-    position6 = a_and_b_and_c
+    position0 = int((a - a_and_b - a_and_c + a_and_b_and_c)/1000)
+    position1 = int((b - b_and_c - a_and_b + a_and_b_and_c)/1000)
+    position2 = int((a_and_b - a_and_b_and_c)/1000)
+    position3 = int((c - a_and_c - b_and_c + a_and_b_and_c)/1000)
+    position4 = int((a_and_c - a_and_b_and_c)/1000)
+    position5 = int((b_and_c - a_and_b_and_c)/1000)
+    position6 = int(a_and_b_and_c/1000)
+    # print( position0,position1,position2,position3,position4,position5,position6)
 
-    # # Custom text labels: change the label of group A
-    # v = venn3(subsets=(position0, position1, position2, position3, position4,
-    #                    position5, position6), set_labels=(a_label, b_label, c_label))
-    # #v.get_label_by_id('A').set_text('The biggest outliers!')
-    # plt.show()
 
     # Line style: can be 'dashed' or 'dotted' for example
     v = venn3(subsets=(position0, position1, position2, position3, position4,
                        position5, position6), set_labels=(a_label, b_label, c_label))
     c = venn3_circles(subsets=(position0, position1, position2, position3, position4,
                                position5, position6), linestyle='dashed', linewidth=1, color="grey")
+    # Custom text labels: change the label of group A
+    # v.get_label_by_id('A').set_text('The biggest outliers!')
+    plt.savefig('outliers.png')
     plt.show()
 
     # # Change one group only
