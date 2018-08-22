@@ -1,11 +1,13 @@
 from math import pi
 import plotly
-plotly.tools.set_credentials_file(username='liyouzhang', api_key='gSJMts7w7BogVSyqxiMq')
+plotly.tools.set_credentials_file(username='PUT_USERNAME', api_key='PUT_API_KEY')
 import plotly.plotly as py
 import plotly.graph_objs as go
 from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt
 import numpy as np
+from matplotlib_venn import venn3, venn3_circles
+
 
 def plot_2D_reduced_X(X_reduced):
     '''plot for 2D - PCA'''
@@ -156,9 +158,6 @@ def make_spider(df, row, title, color, category, num_of_cat,ylim):
     plt.title(title, size=20, color=color, y=1.1)
     plt.savefig('group{}'.format(row))
 
-# Import the library
-import matplotlib.pyplot as plt
-from matplotlib_venn import venn3, venn3_circles
 
 
 def plot_venn_3(a, b, c, a_and_b, a_and_c, b_and_c, a_and_b_and_c, a_label="Group A", b_label="Group B", c_label="Group C"):
@@ -170,95 +169,27 @@ def plot_venn_3(a, b, c, a_and_b, a_and_c, b_and_c, a_and_b_and_c, a_label="Grou
     position4 = int((a_and_c - a_and_b_and_c)/1000)
     position5 = int((b_and_c - a_and_b_and_c)/1000)
     position6 = int(a_and_b_and_c/1000)
-    # print( position0,position1,position2,position3,position4,position5,position6)
-
+ 
 
     # Line style: can be 'dashed' or 'dotted' for example
     v = venn3(subsets=(position0, position1, position2, position3, position4,
                        position5, position6), set_labels=(a_label, b_label, c_label))
     c = venn3_circles(subsets=(position0, position1, position2, position3, position4,
                                position5, position6), linestyle='dashed', linewidth=1, color="grey")
-    # Custom text labels: change the label of group A
-    # v.get_label_by_id('A').set_text('The biggest outliers!')
     plt.savefig('outliers.png')
     plt.show()
 
-    # # Change one group only
-    # v = venn3(subsets=(position0, position1, position2, position3, position4,
-    #                    position5, position6), set_labels=(a_label, b_label, c_label))
-    # c = venn3_circles(subsets=(position0, position1, position2, position3, position4,
-    #                            position5, position6), linestyle='dashed', linewidth=1, color="grey")
-    # c[0].set_lw(8.0)
-    # c[0].set_ls('dotted')
-    # c[0].set_color('skyblue')
-    plt.show()
-
-    # Color
-    v.get_patch_by_id('100').set_alpha(1.0)
-    v.get_patch_by_id('100').set_color('white')
-    plt.show()
-
-def plot_corr(df,size=10):
-    '''Function plots a graphical correlation matrix for each pair of columns in the dataframe.
-
-    Input:
-        df: pandas DataFrame
-        size: vertical and horizontal size of the plot'''
-
-    corr = df.corr()
-    fig, ax = plt.subplots(figsize=(size, size))
-    cax = ax.matshow(df, interpolation='nearest')
-    ax.matshow(corr)
-    fig.colorbar(cax)
-    plt.xticks(range(len(corr.columns)), corr.columns);
-    plt.yticks(range(len(corr.columns)), corr.columns);
-
-def bar_chart(df, bar_height_cols,xlabel,ylabel,barWidth=0.3):
-    # width of the bars
-    barWidth = barWidth
-
-    # Choose the height of the blue bars
-    bars1 = df.bar_height_cols[0]
-
-    # Choose the height of the cyan bars
-    bars2 = df.bar_height_cols[1]
-
-    # # Choose the height of the error bars (bars1)
-    # yer1 = [0.5, 0.4, 0.5]
-
-    # # Choose the height of the error bars (bars2)
-    # yer2 = [1, 0.7, 1]
-
-    # The x position of bars
-    r1 = np.arange(len(bars1))
-    r2 = [x + barWidth for x in r1]
-
-    # Create blue bars
-    plt.bar(r1, bars1, width = barWidth, color = 'blue', edgecolor = 'black', capsize=7, label="account_age")#yerr=yer1,
-
-    # Create cyan bars
-    plt.bar(r2, bars2, width = barWidth, color = 'cyan', edgecolor = "black", capsize=7, label="last_login_today")#yerr=yer2,
-
-    # general layout
-    plt.xticks([r + barWidth for r in range(len(bars1))], df.index)
-    plt.xlabel(xlabel)
-    plt.ylabel(ylabel)
-    plt.legend()
-
-    # Show graphic
-    plt.show()
 
 def plot_lifespan_trend(df,purchase,donations,deposits):
     '''[summary]
     plot the trend of behaviors over lifespan of each user group
+
     Arguments:
         df {pandas dataframe}
         purchase {list of column names } -- columns that describe the purchase behaviors
         donations {list of column names } -- columns that describe the donations behaviors
         deposits {list of column names } -- columns that describe the deposits behaviors
     '''
-
-    # plt.figure(figsize=(16,6))
 
     age = df.loc[0,['ACCOUNT_AGE_MONTHS']]
     values = df.loc[0,purchase]
@@ -267,14 +198,14 @@ def plot_lifespan_trend(df,purchase,donations,deposits):
     last_login = df.loc[0,"last_login_today_months"]
     plt.figure(figsize=(8,6))
     ax1 = plt.subplot(1,1,1)
-    # ax1.set_ylim(0,100)
+
     ax1.scatter((1,12,age),(values[0],values[1],values[2]),marker='^',s=30,label='purchase')
     ax1.plot((1,12,age),(values[0],values[1],values[2]))
     ax1.scatter((1,12,age),(donation_values[0],donation_values[1],donation_values[2]),marker='*',s=30,label='donation')
     ax1.plot((1,12,age),(donation_values[0],donation_values[1],donation_values[2]))
     ax1.scatter((1,12,age),(deposit_values[0],deposit_values[1],deposit_values[2]),marker='o',s=30,label='deposit')
     ax1.plot((1,12,age),(deposit_values[0],deposit_values[1],deposit_values[2]))
-    # ax1.scatter(last_login,-30,marker='*',s=250,label='last_login_months')
+
     ax1.vlines(1,-30,175,linestyles='--',label='first day')
     ax1.vlines(12,-30,175,linestyles='--',label='first year')
     ax1.vlines(age,-30,175,linestyles='--',label='account age')
@@ -286,8 +217,6 @@ def plot_lifespan_trend(df,purchase,donations,deposits):
     plt.legend()
     plt.savefig('group0.png')
     plt.show()
-
-    # plt.setp(ax1.get_xticklabels(), fontsize=6)
 
     for i in range(1,6):
         age = df.loc[i,['ACCOUNT_AGE_MONTHS']]
