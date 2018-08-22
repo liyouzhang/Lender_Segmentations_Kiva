@@ -8,8 +8,12 @@ from sklearn.preprocessing import StandardScaler
 def convert_to_peroid(df):
     '''[summary]
     convert datatime stamp to a period until today
+
     Arguments:
-        df {[pandas dataframe]} -- [description]
+        df {[pandas dataframe]} -- input dataframe
+
+    Returns:
+        df {[pandas dataframe]} -- output dataframe
     '''
     today = df['LAST_LOGIN_DATE'].max()  # 2018-5-9
     df["last_login_today_months"] = (
@@ -22,6 +26,11 @@ def convert_to_peroid(df):
 
 def create_features(df):
     '''Create new features including donation rate, ave_loan_purchase_per_month
+    Arguments:
+        df {[pandas dataframe]} -- input dataframe
+
+    Returns:
+        df {[pandas dataframe]} -- output dataframe
     '''
     #Add 1 to avoid infinite number in division
     df['lifetime_ave_donation_rate'] = df.LIFETIME_DONATION_TOTAL/(df.LIFETIME_ACCOUNT_LOAN_PURCHASE_TOTAL+1)
@@ -29,11 +38,21 @@ def create_features(df):
     #add 1 to avoid infinite number in division
     df['ave_loan_purchase_per_month'] = df.LIFETIME_ACCOUNT_LOAN_PURCHASE_TOTAL/(df.ACCOUNT_AGE_MONTHS +1)
 
-    # #add 1 to avoid infinite number in division
-    # df['ave_deposit_per_month'] = df.LIFETIME_DEPOSIT_TOTAL/(df.ACCOUNT_AGE_MONTHS +1)
     return df
 
 def dummify(df, drop_first_loan_region=False):
+    '''dummify categorical features.
+
+    Arguments:
+        df {[pandas dataframe]} -- input dataframe
+
+    Keyword Arguments:
+        drop_first_loan_region {bool} -- [whether to drop First_Loan_Region feature or not] (default: {False})
+
+    Returns:
+        df {[pandas dataframe]} -- output dataframe
+    '''
+
     #'USER_LOCATION_COUNTRY' - dropped it
     if drop_first_loan_region == False:
         col_list=['FIRST_TIME_DEPOSITOR_REPORTING_CATEGORY',
@@ -51,7 +70,7 @@ def dummify(df, drop_first_loan_region=False):
                                     'FIRST_TRANSACTION_REFERRAL',
                                     'FIRST_BASKET_CATEGORY']
         df = df.drop('FIRST_LOAN_REGION',axis=1)
-        
+
     for col in col_list:
         if df[col].isnull().sum() == 0:
             dummies = pd.get_dummies(df[col], prefix=col, drop_first=True)
@@ -65,6 +84,18 @@ def dummify(df, drop_first_loan_region=False):
 
 
 def drop_columns(df, drop_loan_preference=False,drop_loan_regions=False):
+    '''drop features that will not be used.
+    Arguments:
+        df {[pandas dataframe]} -- input dataframe
+    
+    Keyword Arguments:
+        drop_loan_preference {bool} -- [whether to drop loan preference from the features] (default: {False})
+        drop_loan_regions {bool} -- [whether to drop loan regions from the features] (default: {False})
+
+    Returns:
+        df {[pandas dataframe]} -- output dataframe
+    '''
+
     contain_na_but_important = ['LIFETIME_DEPOSIT_NUM',
                                 'LIFETIME_ACCOUNT_LOAN_PURCHASE_NUM',
                                 'LIFETIME_PROXY_LOAN_PURCHASE_NUM',
@@ -74,9 +105,9 @@ def drop_columns(df, drop_loan_preference=False,drop_loan_regions=False):
                                 'DIRECT_LOAN_PURCHASE_NUM',
                                 'DIRECT_LOAN_PURCHASE_TOTAL',
                                 'LAST_TRANSACTION_DATE',
-                                'FIRST_TRANSACTION_DATE',
                                 'FIRST_DEPOSIT_DATE',
                                 "ACTIVE_LIFETIME_MONTHS"]
+                                'FIRST_TRANSACTION_DATE',
     loan_regions = ['NUM_DISTINCT_COUNTRIES_LENT_TO',
                        'NUM_AFRICA_LOANS',
                        'NUM_ASIA_LOANS',
@@ -86,7 +117,7 @@ def drop_columns(df, drop_loan_preference=False,drop_loan_regions=False):
                        'NUM_OCEANIA_LOANS',
                        'NUM_SOUTH_AMERICA_LOANS']
     loan_preference = [
-                       #'NUM_EXPIRING_SOON_LOANS'
+                    #    'NUM_EXPIRING_SOON_LOANS'
                        'NUM_SECTOR_AGRICULTURE_LOANS',
                        'NUM_SECTOR_TRANSPORTATION_LOANS',
                        'NUM_SECTOR_SERVICE_LOANS',
@@ -145,6 +176,17 @@ def drop_columns(df, drop_loan_preference=False,drop_loan_regions=False):
 
 
 def fill_cont_nans(df, num_cols=["LIFETIME_LENDER_WEIGHTED_AVERAGE_LOAN_TERM"]):
+    '''Fill nans in the numerical categorical features with medians.
+    Arguments:
+        df {[pandas dataframe]} -- input dataframe
+
+    Keyword Arguments:
+        num_cols {list} -- [a list of numerical categorical features] (default: {["LIFETIME_LENDER_WEIGHTED_AVERAGE_LOAN_TERM"]})
+
+    Returns:
+        df {[pandas dataframe]} -- output dataframe
+    '''
+
     for col in num_cols:
         df[col].fillna(df[col].median(), inplace=True)
     return df
@@ -155,42 +197,58 @@ def convert_datetime(df, col_list=[
     #'FIRST_DEPOSIT_DATE',
     #'LAST_TRANSACTION_DATE',
         'LAST_LOGIN_DATE']):
+        '''convert timestamp feature to a period of time.
+        Arguments:
+            df {[pandas dataframe]} -- input dataframe
+    
+        Returns:
+            df {[pandas dataframe]} -- output dataframe
+        '''
+
         for col in col_list:
             df[col] = pd.to_datetime(df[col])
         return df
 
 
-# def logify(df, col_list=['ACTIVE_LIFETIME_MONTHS']):
-#     for col in col_list:
-#         df[col+'_log'] = np.log(df[col]+1)
-#     return df
-
-# def interactify(df, interacter1=['user_rated_driver'], interacter2=['avg_rating_of_driver']):
-#     # print(type(df["user_rated_driver"]))
-#     for col1, col2 in zip(interacter1, interacter2):
-#         df[col1+'_'+col2] = df[col1] * df[col2]
-#     return df
-
-
 def convert_cat_into_int(df, col_list=['IS_CORPORATE_CAMPAIGN_USER', 'IS_FREE_TRIAL_USER']):
-    '''convert categorical data into its integers (0 or 1)'''
+    '''convert categorical data into its integers (0 or 1).
+    
+    Arguments:
+        df {[pandas dataframe]} -- input dataframe
+    
+    Keyword Arguments:
+        col_list {list} -- list of categorical columns  (default: {['IS_CORPORATE_CAMPAIGN_USER', 'IS_FREE_TRIAL_USER']})
+    
+    Returns:
+        df {[pandas dataframe]} -- output dataframe
+    '''
+
     for col in col_list:
         df[col] = df[col].cat.codes
     return df
 
 
 def feature_engineer(df, drop_loan_preference=False,drop_loan_regions=False,drop_first_loan_region=False):
+    '''pipeline function to call other fuctions.
+
+    Arguments:
+        df {[pandas dataframe]} -- input dataframe
+
+    Keyword Arguments:
+        drop_loan_preference {bool} -- [description] (default: {False})
+        drop_loan_regions {bool} -- [description] (default: {False})
+        drop_first_loan_region {bool} -- [description] (default: {False})
+
+    Returns:
+        df {[pandas dataframe]} -- output dataframe
     '''
-    INPUT - dataframe, drop_loan_preference True/False
-    OUTPUT - cleaned dataframe and scaled matrix X
-    '''
+
     df = drop_columns(df,drop_loan_preference=drop_loan_preference,drop_loan_regions=drop_loan_regions) #drop the columns we don't use 
     df = convert_datetime(df)
     df = convert_to_peroid(df)
     df = create_features(df)
     df = fill_cont_nans(df)
     df = dummify(df,drop_first_loan_region=drop_first_loan_region)
-    # df = logify(df)
     df = convert_cat_into_int(df)
     scaler = StandardScaler()
     scaler.fit(df.values)
