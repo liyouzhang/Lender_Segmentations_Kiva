@@ -1,5 +1,8 @@
 # Lenders Segmentation at Kiva.org
 
+[Presentation Link](https://docs.google.com/presentation/d/e/2PACX-1vTGus_OgudE6i2v9zcD-lBMmpm-x1KvW-vm2aWhnBZq8nOLBbJDvF_ZTIoM_Z68jMsoKUb7y9liV29f/pub?start=true&loop=false&delayms=3000)
+
+
 ## Motivation
 
 ### Who is Kiva.org?
