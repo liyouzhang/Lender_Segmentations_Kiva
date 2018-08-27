@@ -3,6 +3,7 @@
 [Presentation Link](https://docs.google.com/presentation/d/e/2PACX-1vTGus_OgudE6i2v9zcD-lBMmpm-x1KvW-vm2aWhnBZq8nOLBbJDvF_ZTIoM_Z68jMsoKUb7y9liV29f/pub?start=true&loop=false&delayms=3000)
 
 
+
 ## Motivation
 
 ### Who is Kiva.org?
@@ -13,19 +14,30 @@ Understanding the lenders' community is crucial to Kiva. People lent through Kiv
 
 ## Data and Algorithms
 
+The Jupyter Notebook walks through the process to produce the results.
+
 ### Data Profiles
 The data is from private Kiva data. The dataset contains ~3 million registered users and 109 features including the identity, the locations, the purchasing, donation and deposit behaviors, and the loan preferences.
 
-### Dimensionality Reduction and KMeans++
+### Dimensionality Reduction with PCA & Clustering with KMeans++
 
 From  Explorative Data Analysis, I identified normal lenders from super lenders and potential lenders based on their purchasing, donating and depositing behaviors. Later I used the Principle Component Analysis on normal lenders group to reduce the dimensionality from 66 features to 6 features while retaining 50% of the information. Lastly, I used Kmeans++ unsupervised machine learning algorithms to cluster normal users into six distinct clusters. The cluster number is chosen based on the silhouette score. Here we are using 3 dimensionalities as a good proxy for 6 dimensionalities for visualization purpose.
+
+![PCA](https://github.com/liyouzhang/Lender_Segmentations_Kiva/blob/master/pics/PCA.png "slide from presentation")
+
+## Recommendations
+
+### Churn Prevention
+
+
+### Effective Marketing
 
 ## Future work
  - Potential Lenders: what are blockers for them from their first purchase?
 
 - Super Lenders: how can we keep super lenders engaged?
 
-- Normal Lenders - the under performing groups:
+- Normal Lenders - how to improve the under performing groups:
     - conversion rate 
     - Engagement
 
