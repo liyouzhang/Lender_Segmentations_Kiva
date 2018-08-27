@@ -35,17 +35,18 @@ From  Explorative Data Analysis, I identified normal lenders from super lenders 
 
 ## Recommendations
 
-### Churn Prevention
+1. **Churn prevention**  
+Engagement at each group’s critical point
 
-### Effective Marketing
+2. **Effective Marketing**  
+Content: educate lenders based on their behavior patterns and business priorities:
+     -  Conversion rate
+     -  Donation amount
+     -  … …
 
-## Future work
+## Future directions
  - Potential Lenders: what are blockers for them from their first purchase?
 
 - Super Lenders: how can we keep super lenders engaged?
-
-- Normal Lenders - how to improve the under performing groups:
-    - conversion rate 
-    - Engagement
 
 
